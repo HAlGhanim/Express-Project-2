@@ -1,6 +1,5 @@
 const express = require("express");
 const {
-  updateUser,
   deleteUser,
   fetchUser,
   signin,
@@ -30,8 +29,11 @@ router.post(
   passport.authenticate("local", { session: false }),
   signin
 );
-router.get("/users", getUsers);
-router.put("/update/:userId", updateUser);
+router.get(
+  "/users",
+  passport.authenticate("jwt", { session: false }),
+  getUsers
+);
 router.delete("/delete/:userId", deleteUser);
 
 module.exports = router;

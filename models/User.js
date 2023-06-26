@@ -5,6 +5,7 @@ const UserSchema = new Schema({
   username: { type: String, unique: true, required: true },
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
+  staff: { type: Boolean, default: false },
   image: { type: String },
   reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
 });
