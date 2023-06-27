@@ -15,6 +15,12 @@ exports.fetchUser = async (userId, next) => {
 
 exports.getUsers = async (req, res, next) => {
   try {
+    if (!req.user.staff) {
+      return next({
+        status: 401,
+        message: "You are not authorized to view users.",
+      });
+    }
     const users = await User.find().select("-__v");
     return res.status(200).json(users);
   } catch (error) {
@@ -51,7 +57,13 @@ exports.signin = async (req, res) => {
 
 exports.deleteUser = async (req, res, next) => {
   try {
-    await User.findByIdAndRemove({ _id: req.user.id });
+    if (!req.user.staff) {
+      return next({
+        status: 401,
+        message: "You are not authorized to delete users.",
+      });
+    }
+    await User.findByIdAndRemove({ _id: req.foundUser.id });
     return res.status(204).end();
   } catch (error) {
     return next(error);

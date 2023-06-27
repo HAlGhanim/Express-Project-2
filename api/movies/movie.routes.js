@@ -6,6 +6,7 @@ const {
   getMovies,
   createMovie,
   getMovieById,
+  deleteMovie,
 } = require("./movie.controllers");
 
 router.param("movieId", async (req, res, next, movieId) => {
@@ -27,5 +28,10 @@ router.post(
 
 router.get("/", getMovies);
 router.get("/:movieId", getMovieById);
+router.delete(
+  "/delete/:movieId",
+  passport.authenticate("jwt", { session: false }),
+  deleteMovie
+);
 
 module.exports = router;
