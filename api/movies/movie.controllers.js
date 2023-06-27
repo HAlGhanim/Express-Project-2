@@ -11,11 +11,19 @@ exports.fetchMovie = async (movieId, next) => {
 
 exports.getMovies = async (req, res, next) => {
   try {
+    const { page, limit } = req.query;
     const movies = await Movie.find()
       .select("-__v -actors -reviews")
-      .populate("genre", "name -_id");
-    // get total documents in the Posts collection
-    return res.status(200).json(movies);
+      .populate("genre", "name -_id")
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec();
+    const count = await Movie.countDocuments();
+    return res.status(200).json({
+      movies,
+      totalPages: Math.ceil(count / limit),
+      currentPage: +page,
+    });
   } catch (error) {
     return next(error);
   }
