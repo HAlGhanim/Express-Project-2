@@ -1,4 +1,9 @@
 const Movie = require("../../models/Movie");
+const {
+  unauthorized,
+  alreadyAdded,
+  notFound,
+} = require("../../middlewares/controllerErrors");
 
 exports.fetchMovie = async (movieId, next) => {
   try {
@@ -39,11 +44,7 @@ exports.getMovieById = async (req, res, next) => {
 
 exports.createMovie = async (req, res, next) => {
   try {
-    if (!req.user.staff)
-      return next({
-        status: 401,
-        message: "You don't have permission to add a Movie.",
-      });
+    if (!req.user.staff) return next(unauthorized);
     const newMovie = await Movie.create(req.body);
     return res.status(201).json(newMovie);
   } catch (error) {
@@ -54,12 +55,8 @@ exports.createMovie = async (req, res, next) => {
 
 exports.deleteMovie = async (req, res, next) => {
   try {
-    if (!req.user.staff)
-      return next({
-        status: 401,
-        message: "You don't have permission to delete a Movie.",
-      });
-    await Movie.findByIdAndRemove({ _id: req.movie.id });
+    if (!req.user.staff) return next(unauthorized);
+    await req.movie.deleteOne();
     return res.status(204).end();
   } catch (error) {
     return next(error);
