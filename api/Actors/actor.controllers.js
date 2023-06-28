@@ -1,5 +1,10 @@
 const Actor = require("../../models/Actor");
 const Movie = require("../../models/Movie");
+const {
+  unauthorized,
+  notFound,
+  alreadyAdded,
+} = require("../../middlewares/controllerErrors");
 
 exports.fetchActor = async (actorId, next) => {
   try {
@@ -12,7 +17,9 @@ exports.fetchActor = async (actorId, next) => {
 
 exports.getActors = async (req, res, next) => {
   try {
-    const actors = await Actor.find().select("-__v").populate("movies", "name");
+    const actors = await Actor.find()
+      .select("-__v")
+      .populate("movies", "name -_id");
     return res.status(200).json(actors);
   } catch (error) {
     return next(error);
@@ -21,28 +28,18 @@ exports.getActors = async (req, res, next) => {
 
 exports.addActor = async (req, res, next) => {
   try {
-    if (!req.user.staff) {
-      return next({
-        status: 401,
-        message: "You must be a staff member to add an actor.",
-      });
-    }
-    const actor = await Actor.create(req.body);
-    return res.status(201).json(actor);
+    if (!req.user.staff) return next(unauthorized);
+    const newActor = await Actor.create(req.body);
+    return res.status(201).json(newActor);
   } catch (error) {
-    return next(error);
+    return next(error.message);
   }
 };
 
 exports.deleteActor = async (req, res, next) => {
   try {
-    if (!req.user.staff) {
-      return next({
-        status: 401,
-        message: "You don't have permission to delete an actor.",
-      });
-    }
-    await Actor.findByIdAndRemove({ _id: req.actor.id });
+    if (!req.user.staff) return next(unauthorized);
+    await req.actor.deleteOne();
     return res.status(204).end();
   } catch (error) {
     return next(error);
@@ -51,21 +48,14 @@ exports.deleteActor = async (req, res, next) => {
 
 exports.addActorToMovie = async (req, res, next) => {
   try {
-    if (!req.user.staff) {
-      return next({
-        status: 401,
-        message: "You don't have permission to add an actor to a movie.",
-      });
-    }
-    const { movieId } = req.params;
-    const foundMovie = await Movie.findById({ _id: movieId });
-    if (!foundMovie) return next({ status: 404, message: "Movie not found" });
-    if (foundMovie.actors.includes(req.actor._id))
-      return next({ status: 400, message: "Actor already added to movie" });
-    await foundMovie.updateOne({
+    const movie = await Movie.findById(req.body.movies);
+    if (!req.user.staff) return next(unauthorized);
+    if (req.actor.movies.includes(req.body.movies)) return next(alreadyAdded);
+    if (!movie) return next(notFound);
+    await req.actor.updateOne({ $push: { movies: req.body.movies } });
+    await Movie.findByIdAndUpdate(req.body.movies, {
       $push: { actors: req.actor._id },
     });
-    await req.actor.updateOne({ $push: { movies: foundMovie._id } });
     return res.status(200).end();
   } catch (error) {
     return next(error);

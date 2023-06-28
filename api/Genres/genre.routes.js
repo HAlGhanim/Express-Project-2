@@ -32,7 +32,7 @@ router.delete(
   deleteGenre
 );
 router.post(
-  "/:genreId/:movieId",
+  "/:genreId",
   passport.authenticate("jwt", { session: false }),
   addGenreToMovie
 );

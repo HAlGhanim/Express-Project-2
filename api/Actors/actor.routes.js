@@ -33,7 +33,7 @@ router.delete(
 );
 
 router.post(
-  "/:actorId/:movieId",
+  "/:actorId",
   passport.authenticate("jwt", { session: false }),
   addActorToMovie
 );

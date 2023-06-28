@@ -1,5 +1,10 @@
 const Genre = require("../../models/Genres");
 const Movie = require("../../models/Movie");
+const {
+  unauthorized,
+  alreadyAdded,
+  notFound,
+} = require("../../middlewares/controllerErrors");
 
 exports.fetchGenre = async (genreId, next) => {
   try {
@@ -12,7 +17,9 @@ exports.fetchGenre = async (genreId, next) => {
 
 exports.getGenres = async (req, res, next) => {
   try {
-    const genres = await Genre.find().select("-__v").populate("movies", "name -_id");
+    const genres = await Genre.find()
+      .select("-__v")
+      .populate("movies", "name -_id");
     return res.status(200).json(genres);
   } catch (error) {
     return next(error);
@@ -21,14 +28,9 @@ exports.getGenres = async (req, res, next) => {
 
 exports.addGenre = async (req, res, next) => {
   try {
-    if (!req.user.staff) {
-      return next({
-        status: 401,
-        message: "You must be a staff member to add a genre.",
-      });
-    }
-    const genre = await Genre.create(req.body);
-    return res.status(201).json(genre);
+    if (!req.user.staff) return next(unauthorized);
+    const newGenre = await Genre.create(req.body);
+    return res.status(201).json(newGenre);
   } catch (error) {
     return next(error);
   }
@@ -36,13 +38,8 @@ exports.addGenre = async (req, res, next) => {
 
 exports.deleteGenre = async (req, res, next) => {
   try {
-    if (!req.user.staff) {
-      return next({
-        status: 401,
-        message: "You don't have permission to delete a genre.",
-      });
-    }
-    await Genre.findByIdAndRemove({ _id: req.genre.id });
+    if (!req.user.staff) return next(unauthorized);
+    await req.genre.deleteOne();
     return res.status(204).end();
   } catch (error) {
     return next(error);
@@ -51,20 +48,14 @@ exports.deleteGenre = async (req, res, next) => {
 
 exports.addGenreToMovie = async (req, res, next) => {
   try {
-    console.log(req.user.staff);
-    if (!req.user.staff) {
-      return next({
-        status: 401,
-        message: "You don't have permission to add a genre to a movie.",
-      });
-    }
-    const { movieId } = req.params;
-    const foundMovie = await Movie.findById({ _id: movieId });
-    if (!foundMovie) return next({ status: 404, message: "Movie not found" });
-    if (foundMovie.genre.includes(req.genre._id))
-      return next({ status: 400, message: "Genre already added to movie" });
-    await foundMovie.updateOne({ $push: { genre: req.genre._id } });
-    await req.genre.updateOne({ $push: { movies: foundMovie._id } });
+    const movie = await Movie.findById(req.body.movies);
+    if (!req.user.staff) return next(unauthorized);
+    if (req.genre.movies.includes(req.body.movies)) return next(alreadyAdded);
+    if (!movie) return next(notFound);
+    await req.genre.updateOne({ $push: { movies: req.body.movies } });
+    await Movie.findByIdAndUpdate(req.body.movies, {
+      $push: { genre: req.genre._id },
+    });
     return res.status(200).end();
   } catch (error) {
     return next(error);
