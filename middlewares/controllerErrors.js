@@ -8,13 +8,13 @@ const notFound = {
   message: "Can't find it",
 };
 
-const alreadyAdded = {
+const alreadyExsists = {
   status: 400,
-  message: "Already added to movie",
+  message: "Already exists",
 };
 
 module.exports = {
   unauthorized,
   notFound,
-  alreadyAdded,
+  alreadyExsists,
 };

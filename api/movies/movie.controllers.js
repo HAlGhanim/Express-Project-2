@@ -1,9 +1,5 @@
 const Movie = require("../../models/Movie");
-const {
-  unauthorized,
-  alreadyAdded,
-  notFound,
-} = require("../../middlewares/controllerErrors");
+const { unauthorized } = require("../../middlewares/controllerErrors");
 
 exports.fetchMovie = async (movieId, next) => {
   try {

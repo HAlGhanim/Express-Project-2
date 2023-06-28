@@ -1,4 +1,9 @@
 const Review = require("../../models/Review");
+const {
+  unauthorized,
+  alreadyAdded,
+  notFound,
+} = require("../../middlewares/controllerErrors");
 
 exports.fetchReview = async (reviewId, next) => {
   try {
@@ -20,14 +25,9 @@ exports.getReviews = async (req, res, next) => {
 
 exports.addReview = async (req, res, next) => {
   try {
-    if (!req.user.staff) {
-      return next({
-        status: 401,
-        message: "You must be a staff member to add a review.",
-      });
-    }
-    const review = await Review.create(req.body);
-    return res.status(201).json(review);
+    if (!req.user.staff) return next(unauthorized);
+    const newReview = await Review.create(req.body);
+    return res.status(201).json(newReview);
   } catch (error) {
     return next(error);
   }
@@ -35,14 +35,8 @@ exports.addReview = async (req, res, next) => {
 
 exports.deleteReview = async (req, res, next) => {
   try {
-
-    if (!req.user.staff) {
-      return next({
-        status: 401,
-        message: "You don't have permission to delete a review.",
-      });
-    }
-    await Review.findByIdAndRemove({ _id: req.review.id });
+    if (!req.user.staff) return next(unauthorized);
+    await req.review.deleteOne();
     return res.status(204).end();
   } catch (error) {
     return next(error);
