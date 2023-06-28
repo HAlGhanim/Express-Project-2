@@ -3,7 +3,9 @@ const { unauthorized } = require("../../middlewares/controllerErrors");
 
 exports.fetchMovie = async (movieId, next) => {
   try {
-    const movie = await Movie.findById(movieId).select("-__v");
+    const movie = await Movie.findById(movieId)
+      .select("-__v")
+      .populate("genres actors.actor reviews", "name text");
     return movie;
   } catch (error) {
     return next(error);
@@ -14,8 +16,8 @@ exports.getMovies = async (req, res, next) => {
   try {
     const { page, limit } = req.query;
     const movies = await Movie.find()
-      .select("-__v  -reviews")
-      .populate("genre actors", "name role -_id")
+      .select("-__v -actors._id")
+      .populate("genre actors.actor", "name role -_id")
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .exec();
