@@ -19,7 +19,7 @@ exports.getMovies = async (req, res, next) => {
     const { page, limit } = req.query;
     const movies = await Movie.find()
       .select("-__v  -reviews")
-      .populate("genre actors", "name -_id")
+      .populate("genre actors", "name role -_id")
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .exec();
