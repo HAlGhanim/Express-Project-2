@@ -20,14 +20,10 @@ router.param("actorId", async (req, res, next, actorId) => {
   }
 });
 
-router.post(
-  "/addActor",
-  passport.authenticate("jwt", { session: false }),
-  addActor
-);
+router.post("/", passport.authenticate("jwt", { session: false }), addActor);
 router.get("/", getActors);
 router.delete(
-  "/delete/:actorId",
+  "/:actorId",
   passport.authenticate("jwt", { session: false }),
   deleteActor
 );
@@ -37,5 +33,4 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   addActorToMovie
 );
-
 module.exports = router;

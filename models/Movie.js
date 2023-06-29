@@ -5,7 +5,7 @@ const MovieSchema = new Schema({
   name: { type: String, unique: true, required: true },
   actors: [
     {
-      role: { type: String, default: "cast member" },
+      role: String,
       actor: { type: Schema.Types.ObjectId, ref: "Actor" },
     },
   ],

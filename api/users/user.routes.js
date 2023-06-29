@@ -9,6 +9,10 @@ const {
 const router = express.Router();
 const passport = require("passport");
 const upload = require("../../middlewares/multer");
+const {
+  validation,
+  fieldValidation,
+} = require("../../middlewares/signupValidation");
 
 // Everything with the word temp is a placeholder that you'll change in accordance with your project
 
@@ -23,19 +27,25 @@ router.param("userId", async (req, res, next, userId) => {
   }
 });
 
-router.post("/signup", upload.single("image"), signup);
+router.post(
+  "/signup",
+  upload.single("image"),
+  validation(),
+  fieldValidation,
+  signup
+);
 router.post(
   "/signin",
   passport.authenticate("local", { session: false }),
   signin
 );
 router.get(
-  "/users",
+  "/",
   passport.authenticate("jwt", { session: false }),
   getUsers
 );
 router.delete(
-  "/delete/:userId",
+  "/:userId",
   passport.authenticate("jwt", { session: false }),
   deleteUser
 );

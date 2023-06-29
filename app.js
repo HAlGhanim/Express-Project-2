@@ -24,7 +24,7 @@ passport.use("local", localStrategy);
 passport.use(jwtStrategy);
 
 // Everything with the word temp is a placeholder that you'll change in accordance with your project
-app.use(userRoutes);
+app.use("/users", userRoutes);
 app.use("/movies", movieRoutes);
 app.use("/actors", actorRoutes);
 app.use("/genres", genreRoutes);

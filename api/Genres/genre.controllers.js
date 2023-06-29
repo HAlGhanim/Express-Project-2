@@ -29,7 +29,7 @@ exports.getGenres = async (req, res, next) => {
 exports.addGenre = async (req, res, next) => {
   try {
     if (!req.user.staff) return next(unauthorized);
-    
+
     const newGenre = await Genre.create(req.body);
     return res.status(201).json(newGenre);
   } catch (error) {
@@ -51,10 +51,8 @@ exports.deleteGenre = async (req, res, next) => {
 exports.addGenreToMovie = async (req, res, next) => {
   try {
     if (!req.user.staff) return next(unauthorized);
-
-    const movie = await Movie.findById(req.body.movies);
     if (req.genre.movies.includes(req.body.movies)) return next(alreadyExsists);
-    if (!movie) return next(notFound);
+    if (!(await Movie.findById(req.body.movies))) return next(notFound);
     await req.genre.updateOne({ $push: { movies: req.body.movies } });
     await Movie.findByIdAndUpdate(req.body.movies, {
       $push: { genre: req.genre._id },

@@ -20,16 +20,12 @@ router.param("movieId", async (req, res, next, movieId) => {
   }
 });
 
-router.post(
-  "/createMovie",
-  passport.authenticate("jwt", { session: false }),
-  createMovie
-);
+router.post("/", passport.authenticate("jwt", { session: false }), createMovie);
 
 router.get("/", getMovies);
 router.get("/:movieId", getMovieById);
 router.delete(
-  "/delete/:movieId",
+  "/:movieId",
   passport.authenticate("jwt", { session: false }),
   deleteMovie
 );

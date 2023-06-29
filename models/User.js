@@ -6,7 +6,7 @@ const UserSchema = new Schema({
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
   staff: { type: Boolean, default: false },
-  image: { type: String },
+  image: { type: String, required: true },
   reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
 });
 

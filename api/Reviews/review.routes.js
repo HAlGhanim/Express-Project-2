@@ -3,9 +3,9 @@ const router = express.Router();
 const passport = require("passport");
 const {
   getReviews,
-  addReview,
   fetchReview,
   deleteReview,
+  addReview,
 } = require("./review.controllers");
 
 router.param("reviewId", async (req, res, next, reviewId) => {
@@ -19,16 +19,15 @@ router.param("reviewId", async (req, res, next, reviewId) => {
   }
 });
 
+router.get("/", getReviews);
+router.delete(
+  "/:reviewId",
+  passport.authenticate("jwt", { session: false }),
+  deleteReview
+);
 router.post(
   "/addReview",
   passport.authenticate("jwt", { session: false }),
   addReview
 );
-router.get("/", getReviews);
-router.delete(
-  "/delete/:reviewId",
-  passport.authenticate("jwt", { session: false }),
-  deleteReview
-);
-
 module.exports = router;

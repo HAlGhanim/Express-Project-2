@@ -21,13 +21,13 @@ router.param("genreId", async (req, res, next, genreId) => {
 });
 
 router.post(
-  "/addGenre",
+  "/",
   passport.authenticate("jwt", { session: false }),
   addGenre
 );
 router.get("/", getGenres);
 router.delete(
-  "/delete/:genreId",
+  "/:genreId",
   passport.authenticate("jwt", { session: false }),
   deleteGenre
 );

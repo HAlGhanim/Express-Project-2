@@ -15,7 +15,7 @@ exports.fetchUser = async (userId, next) => {
 exports.getUsers = async (req, res, next) => {
   try {
     if (!req.user.staff) return next(unauthorized);
-    const users = await User.find().select("-__v");
+    const users = await User.find().select("-__v").populate("reviews");
     return res.status(200).json(users);
   } catch (error) {
     return next(error);

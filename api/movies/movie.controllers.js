@@ -14,7 +14,7 @@ exports.fetchMovie = async (movieId, next) => {
 
 exports.getMovies = async (req, res, next) => {
   try {
-    const { page, limit } = req.query;
+    const { page, limit = 5 } = req.query;
     const movies = await Movie.find()
       .select("-__v -actors._id")
       .populate("genre actors.actor", "name role -_id")
