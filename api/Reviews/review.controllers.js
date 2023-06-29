@@ -32,18 +32,3 @@ exports.deleteReview = async (req, res, next) => {
     return next(error);
   }
 };
-
-exports.addReview = async (req, res, next) => {
-  try {
-    // if (req.user.reviews.includes(req.movie)) return next(alreadyExsists);
-    // if (req.review.movies.includes(req.movie)) return next(alreadyExsists);
-    // if (!(await Movie.findById(req.body.movies))) return next(notFound);
-    await req.user.updateOne({ $push: { reviews: req.body } });
-    await Movie.findByIdAndUpdate(req.body.movieId, {
-      $push: { reviews: req.body },
-    });
-    return res.status(200).end();
-  } catch (error) {
-    return next(error);
-  }
-};

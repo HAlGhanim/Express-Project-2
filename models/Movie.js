@@ -5,13 +5,13 @@ const MovieSchema = new Schema({
   name: { type: String, unique: true, required: true },
   actors: [
     {
-      role: String,
       actor: { type: Schema.Types.ObjectId, ref: "Actor" },
+      role: String,
     },
   ],
   genre: [{ type: Schema.Types.ObjectId, ref: "Genre" }],
   releaseDate: { type: Date, required: true },
-  avgRating: { type: Number, default: 0 },
+  avgRating: [Number],
   reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
 });
 

@@ -25,9 +25,5 @@ router.delete(
   passport.authenticate("jwt", { session: false }),
   deleteReview
 );
-router.post(
-  "/addReview",
-  passport.authenticate("jwt", { session: false }),
-  addReview
-);
+
 module.exports = router;

@@ -33,8 +33,7 @@ exports.signup = async (req, res, next) => {
     req.body.password = await passHash(password);
     req.body.staff = false;
     const newUser = await User.create(req.body);
-    const token = generateToken(newUser);
-    res.status(201).json({ token });
+    res.status(201).json(newUser);
   } catch (err) {
     return res.status(500).json(err.message);
   }
