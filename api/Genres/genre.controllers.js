@@ -4,7 +4,7 @@ const {
   unauthorized,
   alreadyExsists,
   notFound,
-} = require("../../middlewares/controllerErrors");
+} = require("../../middlewares/ifStatements");
 
 exports.fetchGenre = async (genreId, next) => {
   try {

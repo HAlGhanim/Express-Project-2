@@ -9,6 +9,7 @@ const {
   deleteMovie,
   addReview,
 } = require("./movie.controllers");
+const { imposter, unauthorized, ratingValidations } = require("../../middlewares/ifStatements");
 
 router.param("movieId", async (req, res, next, movieId) => {
   try {
@@ -21,19 +22,27 @@ router.param("movieId", async (req, res, next, movieId) => {
   }
 });
 
-router.post("/", passport.authenticate("jwt", { session: false }), createMovie);
+router.post(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  unauthorized,
+  createMovie
+);
 
 router.get("/", getMovies);
 router.get("/:movieId", getMovieById);
 router.delete(
   "/:movieId",
   passport.authenticate("jwt", { session: false }),
+  unauthorized,
   deleteMovie
 );
 
 router.post(
   "/:movieId",
   passport.authenticate("jwt", { session: false }),
+  ratingValidations,
+  imposter,
   addReview
 );
 module.exports = router;

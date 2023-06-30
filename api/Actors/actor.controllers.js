@@ -1,10 +1,9 @@
 const Actor = require("../../models/Actor");
 const Movie = require("../../models/Movie");
 const {
-  unauthorized,
   notFound,
   alreadyExsists,
-} = require("../../middlewares/controllerErrors");
+} = require("../../middlewares/ifStatements");
 
 exports.fetchActor = async (actorId, next) => {
   try {
@@ -28,22 +27,15 @@ exports.getActors = async (req, res, next) => {
 
 exports.addActor = async (req, res, next) => {
   try {
-    if (!req.user.staff) return next(unauthorized);
-    const actorFilter = await Actor.findOne({
-      name: req.body.name,
-      role: req.body.role,
-    });
-    if (actorFilter) return next(alreadyExsists);
     const newActor = await Actor.create(req.body);
     return res.status(201).json(newActor);
   } catch (error) {
-    return next(error.message);
+    return next(error);
   }
 };
 
 exports.deleteActor = async (req, res, next) => {
   try {
-    if (!req.user.staff) return next(unauthorized);
     await req.actor.deleteOne();
     return res.status(204).end();
   } catch (error) {
@@ -53,9 +45,6 @@ exports.deleteActor = async (req, res, next) => {
 
 exports.addActorToMovie = async (req, res, next) => {
   try {
-    if (!req.user.staff) return next(unauthorized);
-    if (req.actor.movies.includes(req.body.movies)) return next(alreadyExsists);
-    if (!(await Movie.findById(req.body.movies))) return next(notFound);
     await req.actor.updateOne({ $push: { movies: req.body.movies } });
     await Movie.findByIdAndUpdate(req.body.movies, {
       $push: { actors: { actor: req.actor._id, role: req.body.role } },

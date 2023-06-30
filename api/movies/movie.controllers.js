@@ -1,10 +1,8 @@
 const Movie = require("../../models/Movie");
 const Review = require("../../models/Review");
 const {
-  unauthorized,
-  imposter,
   alreadyExsists,
-} = require("../../middlewares/controllerErrors");
+} = require("../../middlewares/ifStatements");
 
 exports.fetchMovie = async (movieId, next) => {
   try {
@@ -67,7 +65,6 @@ exports.getMovieById = async (req, res, next) => {
 
 exports.createMovie = async (req, res, next) => {
   try {
-    if (!req.user.staff) return next(unauthorized);
     const newMovie = await Movie.create(req.body);
     return res.status(201).json(newMovie);
   } catch (error) {
@@ -77,7 +74,6 @@ exports.createMovie = async (req, res, next) => {
 
 exports.deleteMovie = async (req, res, next) => {
   try {
-    if (!req.user.staff) return next(unauthorized);
     await req.movie.deleteOne();
     return res.status(204).end();
   } catch (error) {
@@ -91,8 +87,6 @@ exports.addReview = async (req, res, next) => {
       movieId: req.movie._id,
       userId: req.user._id,
     });
-    if (req.body.userId && req.body.userId !== String(req.user._id))
-      return next(imposter);
     if (existingReview) return next(alreadyExsists);
     const review = await Review.create({
       ...req.body,

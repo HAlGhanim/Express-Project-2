@@ -8,6 +8,12 @@ const {
   deleteActor,
   addActorToMovie,
 } = require("./actor.controllers");
+const {
+  unauthorized,
+  existingActor,
+  existingMovieActor,
+  movieNotFound,
+} = require("../../middlewares/ifStatements");
 
 router.param("actorId", async (req, res, next, actorId) => {
   try {
@@ -20,17 +26,27 @@ router.param("actorId", async (req, res, next, actorId) => {
   }
 });
 
-router.post("/", passport.authenticate("jwt", { session: false }), addActor);
+router.post(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  unauthorized,
+  existingActor,
+  addActor
+);
 router.get("/", getActors);
 router.delete(
   "/:actorId",
   passport.authenticate("jwt", { session: false }),
+  unauthorized,
   deleteActor
 );
 
 router.post(
   "/:actorId",
   passport.authenticate("jwt", { session: false }),
+  unauthorized,
+  movieNotFound,
+  existingMovieActor,
   addActorToMovie
 );
 module.exports = router;

@@ -5,7 +5,7 @@ const {
   getReviews,
   fetchReview,
   deleteReview,
-  addReview,
+  getMyReviews,
 } = require("./review.controllers");
 
 router.param("reviewId", async (req, res, next, reviewId) => {
@@ -20,6 +20,11 @@ router.param("reviewId", async (req, res, next, reviewId) => {
 });
 
 router.get("/", getReviews);
+router.get(
+  "/myReviews",
+  passport.authenticate("jwt", { session: false }),
+  getMyReviews
+);
 router.delete(
   "/:reviewId",
   passport.authenticate("jwt", { session: false }),

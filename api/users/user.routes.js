@@ -13,8 +13,7 @@ const {
   validation,
   fieldValidation,
 } = require("../../middlewares/signupValidation");
-
-// Everything with the word temp is a placeholder that you'll change in accordance with your project
+const { unauthorized, signupImage } = require("../../middlewares/ifStatements");
 
 router.param("userId", async (req, res, next, userId) => {
   try {
@@ -30,6 +29,7 @@ router.param("userId", async (req, res, next, userId) => {
 router.post(
   "/signup",
   upload.single("image"),
+  signupImage,
   validation(),
   fieldValidation,
   signup
@@ -42,11 +42,13 @@ router.post(
 router.get(
   "/",
   passport.authenticate("jwt", { session: false }),
+  unauthorized,
   getUsers
 );
 router.delete(
   "/:userId",
   passport.authenticate("jwt", { session: false }),
+  unauthorized,
   deleteUser
 );
 

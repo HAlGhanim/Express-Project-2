@@ -1,7 +1,6 @@
 const User = require("../../models/User");
 const passHash = require("../../utils/auth/passhash");
 const generateToken = require("../../utils/auth/generateToken");
-const { unauthorized } = require("../../middlewares/controllerErrors");
 
 exports.fetchUser = async (userId, next) => {
   try {
@@ -14,8 +13,7 @@ exports.fetchUser = async (userId, next) => {
 
 exports.getUsers = async (req, res, next) => {
   try {
-    if (!req.user.staff) return next(unauthorized);
-    const users = await User.find().select("-__v").populate("reviews");
+    const users = await User.find().select("-__v -reviews");
     return res.status(200).json(users);
   } catch (error) {
     return next(error);
@@ -24,16 +22,12 @@ exports.getUsers = async (req, res, next) => {
 
 exports.signup = async (req, res, next) => {
   try {
-    if (req.file) {
-      req.body.image = `${req.file.path}`;
-      req.body.image = `media/${req.file.filename}`;
-      console.log(req.body.image);
-    }
     const { password } = req.body;
     req.body.password = await passHash(password);
-    req.body.staff = false;
+    delete req.body.staff;
     const newUser = await User.create(req.body);
-    res.status(201).json(newUser);
+    const token = generateToken(newUser);
+    res.status(201).json({ token });
   } catch (err) {
     return res.status(500).json(err.message);
   }
@@ -50,7 +44,6 @@ exports.signin = async (req, res) => {
 
 exports.deleteUser = async (req, res, next) => {
   try {
-    if (!req.user.staff) return next(unauthorized);
     await User.findByIdAndRemove({ _id: req.foundUser.id });
     return res.status(204).end();
   } catch (error) {
