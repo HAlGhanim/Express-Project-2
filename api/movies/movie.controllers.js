@@ -1,8 +1,5 @@
 const Movie = require("../../models/Movie");
 const Review = require("../../models/Review");
-const {
-  alreadyExsists,
-} = require("../../middlewares/ifStatements");
 
 exports.fetchMovie = async (movieId, next) => {
   try {
@@ -51,12 +48,10 @@ exports.getMovies = async (req, res, next) => {
 
 exports.getMovieById = async (req, res, next) => {
   try {
-    console.log(req.movie);
     const totalRating = req.movie.avgRating.reduce(
       (sum, rating) => sum + rating
     );
-    const averageRating = totalRating / req.movie.avgRating.length;
-    req.movie.avgRating = averageRating;
+    req.movie.avgRating = totalRating / req.movie.avgRating.length;
     return res.status(200).json(req.movie);
   } catch (error) {
     return next(error);
@@ -74,6 +69,7 @@ exports.createMovie = async (req, res, next) => {
 
 exports.deleteMovie = async (req, res, next) => {
   try {
+    await Review.deleteMany({ movieId: req.movie._id });
     await req.movie.deleteOne();
     return res.status(204).end();
   } catch (error) {
@@ -83,11 +79,6 @@ exports.deleteMovie = async (req, res, next) => {
 
 exports.addReview = async (req, res, next) => {
   try {
-    const existingReview = await Review.findOne({
-      movieId: req.movie._id,
-      userId: req.user._id,
-    });
-    if (existingReview) return next(alreadyExsists);
     const review = await Review.create({
       ...req.body,
       movieId: req.movie._id,

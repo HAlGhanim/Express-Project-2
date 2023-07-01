@@ -1,10 +1,5 @@
 const Genre = require("../../models/Genres");
 const Movie = require("../../models/Movie");
-const {
-  unauthorized,
-  alreadyExsists,
-  notFound,
-} = require("../../middlewares/ifStatements");
 
 exports.fetchGenre = async (genreId, next) => {
   try {
@@ -28,8 +23,6 @@ exports.getGenres = async (req, res, next) => {
 
 exports.addGenre = async (req, res, next) => {
   try {
-    if (!req.user.staff) return next(unauthorized);
-
     const newGenre = await Genre.create(req.body);
     return res.status(201).json(newGenre);
   } catch (error) {
@@ -39,8 +32,6 @@ exports.addGenre = async (req, res, next) => {
 
 exports.deleteGenre = async (req, res, next) => {
   try {
-    if (!req.user.staff) return next(unauthorized);
-
     await req.genre.deleteOne();
     return res.status(204).end();
   } catch (error) {
@@ -50,9 +41,6 @@ exports.deleteGenre = async (req, res, next) => {
 
 exports.addGenreToMovie = async (req, res, next) => {
   try {
-    if (!req.user.staff) return next(unauthorized);
-    if (req.genre.movies.includes(req.body.movies)) return next(alreadyExsists);
-    if (!(await Movie.findById(req.body.movies))) return next(notFound);
     await req.genre.updateOne({ $push: { movies: req.body.movies } });
     await Movie.findByIdAndUpdate(req.body.movies, {
       $push: { genre: req.genre._id },

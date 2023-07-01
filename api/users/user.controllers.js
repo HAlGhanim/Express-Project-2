@@ -1,5 +1,4 @@
 const User = require("../../models/User");
-const passHash = require("../../utils/auth/passhash");
 const generateToken = require("../../utils/auth/generateToken");
 
 exports.fetchUser = async (userId, next) => {
@@ -22,14 +21,12 @@ exports.getUsers = async (req, res, next) => {
 
 exports.signup = async (req, res, next) => {
   try {
-    const { password } = req.body;
-    req.body.password = await passHash(password);
     delete req.body.staff;
     const newUser = await User.create(req.body);
     const token = generateToken(newUser);
     res.status(201).json({ token });
-  } catch (err) {
-    return res.status(500).json(err.message);
+  } catch (error) {
+    return next(error);
   }
 };
 
@@ -37,8 +34,17 @@ exports.signin = async (req, res) => {
   try {
     const token = generateToken(req.user);
     return res.status(200).json({ token });
-  } catch (err) {
-    return res.status(500).json(err.message);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.updateUser = async (req, res, next) => {
+  try {
+    await req.user.updateOne(req.body);
+    return res.status(204).end();
+  } catch (error) {
+    return next(error);
   }
 };
 

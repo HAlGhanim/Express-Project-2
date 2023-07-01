@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const { unauthorized } = require("../../middlewares/permissions/staff");
 const {
   getReviews,
   fetchReview,
@@ -28,6 +29,7 @@ router.get(
 router.delete(
   "/:reviewId",
   passport.authenticate("jwt", { session: false }),
+  unauthorized,
   deleteReview
 );
 

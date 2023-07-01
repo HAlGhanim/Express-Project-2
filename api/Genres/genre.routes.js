@@ -1,6 +1,9 @@
 const express = require("express");
-const passport = require("passport");
 const router = express.Router();
+const passport = require("passport");
+const { unauthorized } = require("../../middlewares/permissions/staff");
+const { ExsistingGenre } = require("../../middlewares/genres/genreValidators");
+const { movieNotFound } = require("../../middlewares/movies/movieValidators");
 const {
   getGenres,
   fetchGenre,
@@ -23,17 +26,22 @@ router.param("genreId", async (req, res, next, genreId) => {
 router.post(
   "/",
   passport.authenticate("jwt", { session: false }),
+  unauthorized,
   addGenre
 );
 router.get("/", getGenres);
 router.delete(
   "/:genreId",
   passport.authenticate("jwt", { session: false }),
+  unauthorized,
   deleteGenre
 );
 router.post(
   "/:genreId",
   passport.authenticate("jwt", { session: false }),
+  unauthorized,
+  movieNotFound,
+  ExsistingGenre,
   addGenreToMovie
 );
 module.exports = router;

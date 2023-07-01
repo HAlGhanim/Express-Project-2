@@ -1,6 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const { unauthorized } = require("../../middlewares/permissions/staff");
+const { byIdAvgCalc } = require("../../middlewares/movies/avgCalc");
+const {
+  ratingValidations,
+  imposter,
+  existingReview,
+} = require("../../middlewares/movies/reviewValidators");
 const {
   fetchMovie,
   getMovies,
@@ -9,7 +16,6 @@ const {
   deleteMovie,
   addReview,
 } = require("./movie.controllers");
-const { imposter, unauthorized, ratingValidations } = require("../../middlewares/ifStatements");
 
 router.param("movieId", async (req, res, next, movieId) => {
   try {
@@ -30,7 +36,7 @@ router.post(
 );
 
 router.get("/", getMovies);
-router.get("/:movieId", getMovieById);
+router.get("/:movieId", byIdAvgCalc, getMovieById);
 router.delete(
   "/:movieId",
   passport.authenticate("jwt", { session: false }),
@@ -43,6 +49,7 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   ratingValidations,
   imposter,
+  existingReview,
   addReview
 );
 module.exports = router;

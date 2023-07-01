@@ -1,9 +1,5 @@
 const Actor = require("../../models/Actor");
 const Movie = require("../../models/Movie");
-const {
-  notFound,
-  alreadyExsists,
-} = require("../../middlewares/ifStatements");
 
 exports.fetchActor = async (actorId, next) => {
   try {

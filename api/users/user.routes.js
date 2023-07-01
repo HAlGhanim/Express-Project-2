@@ -1,19 +1,22 @@
 const express = require("express");
+const router = express.Router();
+const passport = require("passport");
+const upload = require("../../middlewares/images/multer");
+const { unauthorized } = require("../../middlewares/permissions/staff");
+const { signupImage } = require("../../middlewares/images/pImage");
+const {
+  fieldValidation,
+  validation,
+} = require("../../middlewares/users/signupValidation");
 const {
   deleteUser,
   fetchUser,
   signin,
   signup,
   getUsers,
+  updateUser,
 } = require("./user.controllers");
-const router = express.Router();
-const passport = require("passport");
-const upload = require("../../middlewares/multer");
-const {
-  validation,
-  fieldValidation,
-} = require("../../middlewares/signupValidation");
-const { unauthorized, signupImage } = require("../../middlewares/ifStatements");
+const { hashing } = require("../../middlewares/users/password");
 
 router.param("userId", async (req, res, next, userId) => {
   try {
@@ -32,6 +35,7 @@ router.post(
   signupImage,
   validation(),
   fieldValidation,
+  hashing,
   signup
 );
 router.post(
@@ -44,6 +48,12 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   unauthorized,
   getUsers
+);
+router.put(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  hashing,
+  updateUser
 );
 router.delete(
   "/:userId",
