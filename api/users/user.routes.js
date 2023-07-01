@@ -4,7 +4,7 @@ const passport = require("passport");
 const upload = require("../../middlewares/images/multer");
 const { unauthorized } = require("../../middlewares/permissions/staff");
 const { signupImage } = require("../../middlewares/images/pImage");
-const { hashing } = require("../../middlewares/users/password");
+const { hashing } = require("../../utils/auth/password");
 const {
   deleteUser,
   fetchUser,
@@ -18,7 +18,7 @@ const {
   inputValidator,
   passwordValidator,
   emailValidator,
-} = require("../../middlewares/users/validation");
+} = require("../../middlewares/users/userValidation");
 
 router.param("userId", async (req, res, next, userId) => {
   try {

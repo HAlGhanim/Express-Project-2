@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { unauthorized } = require("../../middlewares/permissions/staff");
+const { byIdAvgCalc } = require("../../middlewares/movies/avgCalc");
 const {
   ratingValidations,
   imposter,
@@ -15,7 +16,6 @@ const {
   deleteMovie,
   addReview,
 } = require("./movie.controllers");
-const { byIdAvgCalc } = require("../../middlewares/movies/avgCalc");
 
 router.param("movieId", async (req, res, next, movieId) => {
   try {
