@@ -34,6 +34,7 @@ exports.getMovies = async (req, res, next) => {
         0
       );
       const averageRating = totalRating / movie.reviews.length;
+
       return { ...movie._doc, avgRating: averageRating };
     });
     return res.status(200).json({
@@ -48,11 +49,7 @@ exports.getMovies = async (req, res, next) => {
 
 exports.getMovieById = async (req, res, next) => {
   try {
-    const totalRating = req.movie.avgRating.reduce(
-      (sum, rating) => sum + rating
-    );
-    req.movie.avgRating = totalRating / req.movie.avgRating.length;
-    return res.status(200).json(req.movie);
+    //magic
   } catch (error) {
     return next(error);
   }
@@ -71,6 +68,10 @@ exports.deleteMovie = async (req, res, next) => {
   try {
     await Review.deleteMany({ movieId: req.movie._id });
     await req.movie.deleteOne();
+    await Movie.updateOne(
+      { _id: req.movie._id },
+      { $set: { reviews: [], avgRating: 0 } }
+    );
     return res.status(204).end();
   } catch (error) {
     return next(error);

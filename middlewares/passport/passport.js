@@ -16,11 +16,11 @@ exports.localStrategy = new LocalStrategy(
         $or: [{ username: userOrEmail }, { email: userOrEmail }],
       });
       if (!user) {
-        return done(null, false);
+        return done({ message: "Invalid username / email" }, false);
       }
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (!passwordMatch) {
-        return done(null, false);
+        return done({ message: "Invalid password" }, false);
       }
       return done(null, user);
     } catch (error) {

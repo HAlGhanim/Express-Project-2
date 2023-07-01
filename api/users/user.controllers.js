@@ -1,4 +1,5 @@
 const User = require("../../models/User");
+const Review = require("../../models/Review");
 const generateToken = require("../../utils/auth/generateToken");
 
 exports.fetchUser = async (userId, next) => {
@@ -50,6 +51,7 @@ exports.updateUser = async (req, res, next) => {
 
 exports.deleteUser = async (req, res, next) => {
   try {
+    await Review.deleteMany({ userId: req.foundUser._id });
     await User.findByIdAndRemove({ _id: req.foundUser.id });
     return res.status(204).end();
   } catch (error) {

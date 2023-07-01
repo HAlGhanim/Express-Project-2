@@ -4,10 +4,7 @@ const passport = require("passport");
 const upload = require("../../middlewares/images/multer");
 const { unauthorized } = require("../../middlewares/permissions/staff");
 const { signupImage } = require("../../middlewares/images/pImage");
-const {
-  fieldValidation,
-  validation,
-} = require("../../middlewares/users/signupValidation");
+const { hashing } = require("../../middlewares/users/password");
 const {
   deleteUser,
   fetchUser,
@@ -16,7 +13,12 @@ const {
   getUsers,
   updateUser,
 } = require("./user.controllers");
-const { hashing } = require("../../middlewares/users/password");
+const {
+  FieldValidation,
+  inputValidator,
+  passwordValidator,
+  emailValidator,
+} = require("../../middlewares/users/validation");
 
 router.param("userId", async (req, res, next, userId) => {
   try {
@@ -33,8 +35,8 @@ router.post(
   "/signup",
   upload.single("image"),
   signupImage,
-  validation(),
-  fieldValidation,
+  inputValidator([...emailValidator, ...passwordValidator], true),
+  FieldValidation,
   hashing,
   signup
 );
@@ -52,6 +54,8 @@ router.get(
 router.put(
   "/",
   passport.authenticate("jwt", { session: false }),
+  inputValidator([...emailValidator, ...passwordValidator], false),
+  FieldValidation,
   hashing,
   updateUser
 );

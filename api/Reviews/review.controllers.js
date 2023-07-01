@@ -1,4 +1,6 @@
 const Review = require("../../models/Review");
+const Movie = require("../../models/Movie");
+
 exports.fetchReview = async (reviewId, next) => {
   try {
     const review = await Review.findById(reviewId).select("-__v");
@@ -42,6 +44,10 @@ exports.getMyReviews = async (req, res, next) => {
 exports.deleteReview = async (req, res, next) => {
   try {
     await req.review.deleteOne();
+    await Movie.updateOne(
+      { _id: req.review.movieId },
+      { $pull: { reviews: req.review._id } }
+    );
     return res.status(204).end();
   } catch (error) {
     return next(error);
