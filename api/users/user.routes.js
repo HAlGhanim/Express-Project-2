@@ -4,7 +4,7 @@ const passport = require("passport");
 const upload = require("../../middlewares/images/multer");
 const { unauthorized } = require("../../middlewares/permissions/staff");
 const { signupImage } = require("../../middlewares/images/pImage");
-const { hashing } = require("../../utils/auth/password");
+const { hashing } = require("../../utils/auth/passhash");
 const {
   deleteUser,
   fetchUser,
