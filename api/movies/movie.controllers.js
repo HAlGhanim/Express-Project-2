@@ -23,7 +23,7 @@ exports.getMovies = async (req, res, next) => {
       .select("-__v -actors._id")
       .populate(
         "genre actors.actor reviews",
-        "name role text rating userId"
+        "name role -_id text rating userId"
       )
       .limit(limit * 1)
       .skip((page - 1) * limit)
@@ -51,6 +51,21 @@ exports.getMovies = async (req, res, next) => {
 exports.getMovieById = async (req, res, next) => {
   try {
     //magic
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.getMoviesByName = async (req, res, next) => {
+  try {
+    const { name } = req.params;
+    const movies = await Movie.findOne({ name: name })
+      .select("-__v -actors._id")
+      .populate(
+        "genre actors.actor reviews",
+        "name role -_id text rating userId"
+      );
+    return res.status(200).json(movies);
   } catch (error) {
     return next(error);
   }

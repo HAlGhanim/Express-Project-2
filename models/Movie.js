@@ -6,7 +6,7 @@ const MovieSchema = new Schema({
   actors: [
     {
       actor: { type: Schema.Types.ObjectId, ref: "Actor" },
-      role: String,
+      role: {type: String, required: true},
     },
   ],
   genre: [{ type: Schema.Types.ObjectId, ref: "Genre" }],

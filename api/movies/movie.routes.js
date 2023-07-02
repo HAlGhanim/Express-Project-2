@@ -15,6 +15,7 @@ const {
   getMovieById,
   deleteMovie,
   addReview,
+  getMoviesByName,
 } = require("./movie.controllers");
 
 router.param("movieId", async (req, res, next, movieId) => {
@@ -37,6 +38,8 @@ router.post(
 
 router.get("/", getMovies);
 router.get("/:movieId", byIdAvgCalc, getMovieById);
+router.get("/name/:name", getMoviesByName);
+
 router.delete(
   "/:movieId",
   passport.authenticate("jwt", { session: false }),
