@@ -16,9 +16,12 @@ exports.existingActor = async (req, res, next) => {
 };
 
 exports.exsistingRole = async (req, res, next) => {
-  const role = await Movie.find({ actors: { role: req.body.role } });
+  const role = await Movie.findOne({
+    "actors.role": req.body.role,
+  });
   if (role)
     return next({ status: 400, message: "The role is already in this movie" });
+  return next();
 };
 
 exports.existingMovieActor = (req, res, next) => {

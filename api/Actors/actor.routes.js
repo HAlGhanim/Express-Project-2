@@ -47,8 +47,8 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   unauthorized,
   movieNotFound,
-  exsistingRole,
   existingMovieActor,
+  exsistingRole,
   addActorToMovie
 );
 module.exports = router;

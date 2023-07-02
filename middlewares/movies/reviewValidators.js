@@ -28,3 +28,12 @@ exports.existingReview = async (req, res, next) => {
     });
   return next();
 };
+
+exports.deleteValidation = async (req, res, next) => {
+  if (!req.review.userId.equals(req.user._id))
+    return next({
+      status: 401,
+      message: "You can't delete someone else's review",
+    });
+  return next();
+};

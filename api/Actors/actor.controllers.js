@@ -32,6 +32,10 @@ exports.addActor = async (req, res, next) => {
 
 exports.deleteActor = async (req, res, next) => {
   try {
+    await Movie.updateMany(
+      { "actors.actor": req.actor._id },
+      { $pull: { actors: { actor: req.actor._id } } }
+    );
     await req.actor.deleteOne();
     return res.status(204).end();
   } catch (error) {
@@ -42,9 +46,12 @@ exports.deleteActor = async (req, res, next) => {
 exports.addActorToMovie = async (req, res, next) => {
   try {
     await req.actor.updateOne({ $push: { movies: req.body.movies } });
-    await Movie.findByIdAndUpdate(req.body.movies, {
-      $push: { actors: { actor: req.actor._id, role: req.body.role } },
-    });
+    await Movie.updateOne(
+      { _id: req.body.movies },
+      {
+        $push: { actors: { actor: req.actor._id, role: req.body.role } },
+      }
+    );
     return res.status(200).end();
   } catch (error) {
     return next(error);

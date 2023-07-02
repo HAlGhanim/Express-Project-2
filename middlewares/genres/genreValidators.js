@@ -6,4 +6,5 @@ exports.ExsistingGenre = (req, res, next) => {
       status: 400,
       message: "Genre already exists",
     });
+  return next();
 };

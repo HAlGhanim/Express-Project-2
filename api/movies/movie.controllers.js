@@ -1,5 +1,6 @@
 const Movie = require("../../models/Movie");
 const Review = require("../../models/Review");
+const Actor = require("../../models/Actor");
 
 exports.fetchMovie = async (movieId, next) => {
   try {
@@ -22,7 +23,7 @@ exports.getMovies = async (req, res, next) => {
       .select("-__v -actors._id")
       .populate(
         "genre actors.actor reviews",
-        "name role -_id text rating userId"
+        "name role text rating userId"
       )
       .limit(limit * 1)
       .skip((page - 1) * limit)
@@ -66,6 +67,8 @@ exports.createMovie = async (req, res, next) => {
 
 exports.deleteMovie = async (req, res, next) => {
   try {
+    const actors = await Actor.find({ movies: req.movie._id });
+    await actors.movies.deleteMany(req.movie._id);
     await Review.deleteMany({ movieId: req.movie._id });
     await req.movie.deleteOne();
     await Movie.updateOne(

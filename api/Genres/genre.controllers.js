@@ -32,6 +32,11 @@ exports.addGenre = async (req, res, next) => {
 
 exports.deleteGenre = async (req, res, next) => {
   try {
+    console.log(req.genre.name);
+    await Movie.updateMany(
+      { genre: req.genre },
+      { $pull: { genre: req.genre._id } }
+    );
     await req.genre.deleteOne();
     return res.status(204).end();
   } catch (error) {
@@ -42,9 +47,12 @@ exports.deleteGenre = async (req, res, next) => {
 exports.addGenreToMovie = async (req, res, next) => {
   try {
     await req.genre.updateOne({ $push: { movies: req.body.movies } });
-    await Movie.findByIdAndUpdate(req.body.movies, {
-      $push: { genre: req.genre._id },
-    });
+    await Movie.updateOne(
+      { _id: req.body.movies },
+      {
+        $push: { genre: req.genre._id },
+      }
+    );
     return res.status(200).end();
   } catch (error) {
     return next(error);
