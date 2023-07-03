@@ -4,7 +4,10 @@ const passport = require("passport");
 const upload = require("../../middlewares/images/multer");
 const { unauthorized } = require("../../middlewares/permissions/staff");
 const { signupImage } = require("../../middlewares/images/pImage");
-const { hashing } = require("../../utils/auth/passhash");
+const { hashing } = require("../../utils/auth/password");
+const {
+  exsistingUpdateValidation,
+} = require("../../middlewares/users/exsistingUpdateValidation");
 const {
   deleteUser,
   fetchUser,
@@ -56,9 +59,11 @@ router.put(
   passport.authenticate("jwt", { session: false }),
   inputValidator([...emailValidator, ...passwordValidator], false),
   FieldValidation,
+  exsistingUpdateValidation,
   hashing,
   updateUser
 );
+
 router.delete(
   "/:userId",
   passport.authenticate("jwt", { session: false }),
