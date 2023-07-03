@@ -60,7 +60,7 @@ exports.getMoviesByName = async (req, res, next) => {
   try {
     const { name } = req.params;
     const movies = await Movie.findOne({ name: name })
-      .select("-__v -actors._id")
+      .select("-__v -actors._id -avgRating")
       .populate(
         "genre actors.actor reviews",
         "name role -_id text rating userId"
@@ -83,7 +83,10 @@ exports.createMovie = async (req, res, next) => {
 exports.deleteMovie = async (req, res, next) => {
   try {
     const actors = await Actor.find({ movies: req.movie._id });
-    await actors.movies.deleteMany(req.movie._id);
+    await Actor.updateMany(
+      { movies: req.movie._id },
+      { $pull: { movies: req.movie._id } }
+    );
     await Review.deleteMany({ movieId: req.movie._id });
     await req.movie.deleteOne();
     await Movie.updateOne(
